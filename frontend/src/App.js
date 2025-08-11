@@ -519,6 +519,34 @@ function App() {
                   <>
                     <Separator className="bg-slate-700 my-6" />
                     <div className="space-y-4">
+                      <h3 className="text-lg font-medium text-white flex items-center gap-2">
+                        <Database className="h-5 w-5" />
+                        Управление данными
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <Button onClick={createBackup} className="bg-blue-600 hover:bg-blue-700 text-white">
+                          <Upload className="h-4 w-4 mr-2" />
+                          Создать резервную копию
+                        </Button>
+                        <Button onClick={restoreFromBackup} className="bg-orange-600 hover:bg-orange-700 text-white">
+                          <Download className="h-4 w-4 mr-2" />
+                          Восстановить данные
+                        </Button>
+                        <Button onClick={exportAdmins} className="bg-green-600 hover:bg-green-700 text-white">
+                          <Download className="h-4 w-4 mr-2" />
+                          Экспорт админов
+                        </Button>
+                      </div>
+                      <Alert>
+                        <Database className="h-4 w-4" />
+                        <AlertDescription className="text-slate-300">
+                          Данные автоматически сохраняются в файлы при каждом изменении. 
+                          Используйте эти кнопки для ручного управления резервными копиями.
+                        </AlertDescription>
+                      </Alert>
+                    </div>
+                    <Separator className="bg-slate-700 my-6" />
+                    <div className="space-y-4">
                       <h3 className="text-lg font-medium text-white">Добавить администратора</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Input
