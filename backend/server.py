@@ -80,6 +80,101 @@ class BlockIPRequest(BaseModel):
     reason: str
 
 # Helper functions
+async def save_admins_to_file():
+    """Save all admins to JSON file"""
+    try:
+        admins = []
+        async for admin in app.mongodb.telegram_admins.find():
+            admins.append({
+                "id": admin.get("id"),
+                "name": admin.get("name"),
+                "telegram_handle": admin.get("telegram_handle"),
+                "created_at": admin.get("created_at").isoformat() if admin.get("created_at") else None
+            })
+        
+        async with aiofiles.open(ADMINS_FILE, 'w', encoding='utf-8') as f:
+            await f.write(json.dumps(admins, indent=2, ensure_ascii=False))
+        
+        print(f"✅ Сохранено {len(admins)} админов в файл {ADMINS_FILE}")
+    except Exception as e:
+        print(f"❌ Ошибка сохранения админов в файл: {e}")
+
+async def load_admins_from_file():
+    """Load admins from JSON file to database"""
+    try:
+        if not ADMINS_FILE.exists():
+            print("📁 Файл админов не найден, пропускаем загрузку")
+            return
+        
+        async with aiofiles.open(ADMINS_FILE, 'r', encoding='utf-8') as f:
+            content = await f.read()
+            admins = json.loads(content)
+        
+        loaded_count = 0
+        for admin_data in admins:
+            # Check if admin already exists
+            existing = await app.mongodb.telegram_admins.find_one({"id": admin_data["id"]})
+            if not existing:
+                # Convert created_at back to datetime
+                if admin_data.get("created_at"):
+                    from datetime import datetime
+                    admin_data["created_at"] = datetime.fromisoformat(admin_data["created_at"])
+                
+                await app.mongodb.telegram_admins.insert_one(admin_data)
+                loaded_count += 1
+        
+        print(f"✅ Загружено {loaded_count} новых админов из файла")
+    except Exception as e:
+        print(f"❌ Ошибка загрузки админов из файла: {e}")
+
+async def save_blocked_ips_to_file():
+    """Save blocked IPs to JSON file"""
+    try:
+        blocked_ips = []
+        async for ip in app.mongodb.blocked_ips.find():
+            blocked_ips.append({
+                "id": ip.get("id"),
+                "ip": ip.get("ip"),
+                "reason": ip.get("reason"),
+                "blocked_at": ip.get("blocked_at").isoformat() if ip.get("blocked_at") else None,
+                "blocked_by": ip.get("blocked_by")
+            })
+        
+        async with aiofiles.open(BLOCKED_IPS_FILE, 'w', encoding='utf-8') as f:
+            await f.write(json.dumps(blocked_ips, indent=2, ensure_ascii=False))
+        
+        print(f"✅ Сохранено {len(blocked_ips)} заблокированных IP в файл")
+    except Exception as e:
+        print(f"❌ Ошибка сохранения IP в файл: {e}")
+
+async def load_blocked_ips_from_file():
+    """Load blocked IPs from JSON file to database"""
+    try:
+        if not BLOCKED_IPS_FILE.exists():
+            print("📁 Файл заблокированных IP не найден, пропускаем загрузку")
+            return
+        
+        async with aiofiles.open(BLOCKED_IPS_FILE, 'r', encoding='utf-8') as f:
+            content = await f.read()
+            blocked_ips = json.loads(content)
+        
+        loaded_count = 0
+        for ip_data in blocked_ips:
+            # Check if IP already exists
+            existing = await app.mongodb.blocked_ips.find_one({"id": ip_data["id"]})
+            if not existing:
+                # Convert blocked_at back to datetime
+                if ip_data.get("blocked_at"):
+                    from datetime import datetime
+                    ip_data["blocked_at"] = datetime.fromisoformat(ip_data["blocked_at"])
+                
+                await app.mongodb.blocked_ips.insert_one(ip_data)
+                loaded_count += 1
+        
+        print(f"✅ Загружено {loaded_count} новых заблокированных IP из файла")
+    except Exception as e:
+        print(f"❌ Ошибка загрузки IP из файла: {e}")
+
 async def send_telegram_message(message: str):
     """Send message to Telegram channel"""
     if not TELEGRAM_TOKEN:
