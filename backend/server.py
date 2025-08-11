@@ -407,6 +407,9 @@ async def block_ip(block_request: BlockIPRequest, user = Depends(get_current_use
     
     result = await app.mongodb.blocked_ips.insert_one(blocked_ip)
     
+    # Save to file after successful database insertion
+    await save_blocked_ips_to_file()
+    
     # Return the blocked IP data without MongoDB ObjectId
     return {
         "id": blocked_ip["id"],
