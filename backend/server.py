@@ -230,8 +230,15 @@ async def create_admin(admin_data: AdminCreate, user = Depends(get_current_user)
         "created_at": datetime.utcnow()
     }
     
-    await app.mongodb.telegram_admins.insert_one(admin)
-    return admin
+    result = await app.mongodb.telegram_admins.insert_one(admin)
+    
+    # Return the admin data without MongoDB ObjectId
+    return {
+        "id": admin["id"],
+        "name": admin["name"],
+        "telegram_handle": admin["telegram_handle"],
+        "created_at": admin["created_at"]
+    }
 
 @app.delete("/api/admins/{admin_id}")
 async def delete_admin(admin_id: str, user = Depends(get_current_user)):
