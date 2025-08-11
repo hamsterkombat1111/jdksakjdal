@@ -47,7 +47,11 @@ async def startup_db_client():
     app.mongodb_client = AsyncIOMotorClient(MONGO_URL)
     app.mongodb = app.mongodb_client[DB_NAME]
     
-    # Create admin user
+    # Load data from files first
+    await load_admins_from_file()
+    await load_blocked_ips_from_file()
+    
+    # Create admin user if doesn't exist
     admin_exists = await app.mongodb.users.find_one({"username": "admin"})
     if not admin_exists:
         admin_password = hashlib.sha256("qwerqwer".encode()).hexdigest()
@@ -58,6 +62,9 @@ async def startup_db_client():
             "role": "admin",
             "created_at": datetime.utcnow()
         })
+        print("✅ Создан админ аккаунт: admin/qwerqwer")
+    
+    print("🚀 Сервер запущен и готов к работе!")
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
