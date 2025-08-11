@@ -287,8 +287,16 @@ async def block_ip(block_request: BlockIPRequest, user = Depends(get_current_use
         "blocked_by": user.get("username")
     }
     
-    await app.mongodb.blocked_ips.insert_one(blocked_ip)
-    return blocked_ip
+    result = await app.mongodb.blocked_ips.insert_one(blocked_ip)
+    
+    # Return the blocked IP data without MongoDB ObjectId
+    return {
+        "id": blocked_ip["id"],
+        "ip": blocked_ip["ip"],
+        "reason": blocked_ip["reason"],
+        "blocked_at": blocked_ip["blocked_at"],
+        "blocked_by": blocked_ip["blocked_by"]
+    }
 
 @app.delete("/api/blocked-ips/{ip_id}")
 async def unblock_ip(ip_id: str, user = Depends(get_current_user)):
