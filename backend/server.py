@@ -344,6 +344,9 @@ async def create_admin(admin_data: AdminCreate, user = Depends(get_current_user)
     
     result = await app.mongodb.telegram_admins.insert_one(admin)
     
+    # Save to file after successful database insertion
+    await save_admins_to_file()
+    
     # Return the admin data without MongoDB ObjectId
     return {
         "id": admin["id"],
