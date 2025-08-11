@@ -22,6 +22,14 @@ CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "*")
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
 TELEGRAM_CHAT_ID = int(os.environ.get("TELEGRAM_CHAT_ID", "-1002727327119"))
 
+# File paths for data persistence
+DATA_DIR = Path("/app/data")
+ADMINS_FILE = DATA_DIR / "admins.json"
+BLOCKED_IPS_FILE = DATA_DIR / "blocked_ips.json"
+
+# Create data directory if it doesn't exist
+DATA_DIR.mkdir(exist_ok=True)
+
 app = FastAPI()
 
 # CORS middleware
