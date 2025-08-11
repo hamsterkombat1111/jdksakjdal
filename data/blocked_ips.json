@@ -1,0 +1,16 @@
+[
+  {
+    "id": "a272b2f0-ded7-45eb-bf1d-46ab8b301197",
+    "ip": "192.168.1.100",
+    "reason": "Test blocking from API test",
+    "blocked_at": "2025-08-11T23:31:23.806000",
+    "blocked_by": "admin"
+  },
+  {
+    "id": "622516cc-108c-4678-9880-d0a80e434981",
+    "ip": "10.0.0.5",
+    "reason": "Test blocking new IP",
+    "blocked_at": "2025-08-11T23:34:53.924000",
+    "blocked_by": "admin"
+  }
+]
