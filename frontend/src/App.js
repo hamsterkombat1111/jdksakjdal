@@ -26,7 +26,10 @@ import {
   Settings,
   Crown,
   Ban,
-  Eye
+  Eye,
+  Download,
+  Upload,
+  Database
 } from 'lucide-react';
 import axios from 'axios';
 
