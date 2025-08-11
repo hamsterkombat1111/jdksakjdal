@@ -453,6 +453,45 @@ async def get_visit_logs(user = Depends(get_current_user), limit: int = 50):
         })
     return logs
 
+@app.post("/api/backup")
+async def create_backup(user = Depends(get_current_user)):
+    """Create backup of all data to files"""
+    if not user or user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    await save_admins_to_file()
+    await save_blocked_ips_to_file()
+    
+    return {"message": "Backup created successfully", "files": [str(ADMINS_FILE), str(BLOCKED_IPS_FILE)]}
+
+@app.post("/api/restore")
+async def restore_from_backup(user = Depends(get_current_user)):
+    """Restore data from files to database"""
+    if not user or user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    await load_admins_from_file()
+    await load_blocked_ips_from_file()
+    
+    return {"message": "Data restored from backup files"}
+
+@app.get("/api/export/admins")
+async def export_admins(user = Depends(get_current_user)):
+    """Export admins data"""
+    if not user or user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    admins = []
+    async for admin in app.mongodb.telegram_admins.find():
+        admins.append({
+            "id": admin.get("id"),
+            "name": admin.get("name"),
+            "telegram_handle": admin.get("telegram_handle"),
+            "created_at": admin.get("created_at")
+        })
+    
+    return {"admins": admins, "count": len(admins), "exported_at": datetime.utcnow()}
+
 @app.get("/")
 async def root():
     return {"message": "PrankVZ Site API"}
