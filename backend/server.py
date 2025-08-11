@@ -365,6 +365,9 @@ async def delete_admin(admin_id: str, user = Depends(get_current_user)):
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Admin not found")
     
+    # Update file after successful deletion
+    await save_admins_to_file()
+    
     return {"message": "Admin deleted"}
 
 @app.get("/api/blocked-ips")
