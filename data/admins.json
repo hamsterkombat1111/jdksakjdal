@@ -10,5 +10,11 @@
     "name": "Бес",
     "telegram_handle": "testtest",
     "created_at": "2025-08-11T23:42:23.052000"
+  },
+  {
+    "id": "102c1360-8c28-4e18-aca7-e062134c13db",
+    "name": "Тестовый Админ",
+    "telegram_handle": "testadmin123",
+    "created_at": "2025-08-11T23:55:00.794000"
   }
 ]
