@@ -12,6 +12,8 @@ import httpx
 from user_agents import parse
 import asyncio
 import json
+import aiofiles
+from pathlib import Path
 
 # Environment variables
 MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
