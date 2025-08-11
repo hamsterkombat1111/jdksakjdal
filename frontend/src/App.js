@@ -186,8 +186,52 @@ function App() {
     }
   };
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleString('ru-RU');
+  const createBackup = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      
+      await axios.post(`${BACKEND_URL}/api/backup`, {}, config);
+      toast.success('Резервная копия создана!');
+    } catch (error) {
+      toast.error('Ошибка создания резервной копии');
+    }
+  };
+
+  const restoreFromBackup = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      
+      await axios.post(`${BACKEND_URL}/api/restore`, {}, config);
+      loadAdminData();
+      toast.success('Данные восстановлены из резервной копии!');
+    } catch (error) {
+      toast.error('Ошибка восстановления данных');
+    }
+  };
+
+  const exportAdmins = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      
+      const response = await axios.get(`${BACKEND_URL}/api/export/admins`, config);
+      
+      // Download as JSON file
+      const dataStr = JSON.stringify(response.data, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `admins_backup_${new Date().toISOString().split('T')[0]}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+      
+      toast.success(`Экспортировано ${response.data.count} администраторов`);
+    } catch (error) {
+      toast.error('Ошибка экспорта данных');
+    }
   };
 
   return (
